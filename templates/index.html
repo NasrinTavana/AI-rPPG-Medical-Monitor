@@ -1,0 +1,238 @@
+<!doctype html>
+<html
+  lang="fa"
+  dir="rtl"
+  class="h-full bg-[#0a0a0f] text-white overflow-hidden flex items-center justify-center p-5"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+    <title>ME-rPPG</title>
+    <!-- Tailwind CSS v4 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <!-- Vazirmatn Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: "Vazirmatn", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center h-full w-full">
+    <!-- Card Container -->
+    <div
+      class="w-[380px] h-[620px] bg-white/3 border border-white/6 rounded-[20px] p-5 flex flex-col justify-between shrink-0"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-center gap-1.5">
+        <i class="fas fa-heart-pulse text-rose-500 animate-pulse"></i>
+        <span class="font-semibold text-sm"> پایش سلامت ME-rPPG</span>
+        <span class=" text-xs">تخمینی</span>
+      </div>
+
+      <!-- Video Wrap -->
+      <div
+        class="relative rounded-xl overflow-hidden bg-black w-full h-[180px] shrink-0"
+      >
+        <video
+          id="video"
+          autoplay
+          playsinline
+          muted
+          class="w-full h-full object-cover block"
+        ></video>
+        <canvas
+          id="faceCanvas"
+          class="absolute inset-0 w-full h-full pointer-events-none"
+        ></canvas>
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-black/70 transition-opacity duration-300"
+          id="overlay"
+        >
+          <div class="text-center text-white/40 text-xs">
+            <i class="fas fa-camera text-2xl block mb-2"></i>
+            برای شروع دکمه زیر را فشار دهید
+          </div>
+        </div>
+      </div>
+
+      <!-- HR Display Area -->
+      <div class="h-[60px] flex items-center justify-center gap-2 mt-2">
+        <i class="fas fa-heart text-rose-500 text-lg"></i>
+        <span class="text-[#6b7280] text-[10px]">ضربان قلب:</span>
+        <span
+          class="text-5xl font-light leading-none w-20 text-center"
+          id="hrDisplay"
+          >0</span
+        >
+        <span class="text-[#6b7280] text-[10px]">BPM</span>
+      </div>
+
+      <!-- Status & Stability -->
+      <div class="text-center">
+        <div class="flex items-center justify-center gap-1.5">
+          <span
+            class="w-1.75 h-1.75 rounded-full shrink-0 bg-[#6b7280]"
+            id="statusDot"
+          ></span>
+          <span class="text-[10px] text-white/60" id="statusText">آماده</span>
+          <span class="text-[10px] text-[#6b7280]" id="samplesText"></span>
+        </div>
+        <div class="h-4 mt-1">
+          <span
+            id="status-message"
+            class="text-[10px] font-semibold text-amber-500"
+          ></span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center justify-center gap-2">
+        <button
+          class="px-4 py-2 bg-[#10b981] hover:bg-[#059669] text-white font-medium text-xs border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.25 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg"
+          id="startBtn"
+        >
+          <i class="fas fa-play"></i> شروع
+        </button>
+        <button
+          class="px-4 py-2 bg-[#ef4444] hover:bg-[#dc2626] text-white font-medium text-xs border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.25 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg"
+          id="stopBtn"
+          disabled
+        >
+          <i class="fas fa-stop"></i> توقف
+        </button>
+        <button
+          class="px-4 py-2 bg-white/5 hover:bg-white/10 text-[#9ca3af] hover:text-white font-medium text-xs border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.25 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg"
+          id="resetBtn"
+        >
+          <i class="fas fa-rotate"></i>
+        </button>
+      </div>
+
+      <!-- Stats Grid (2x2) -->
+      <div class="grid grid-cols-2 gap-2 shrink-0 my-2">
+        <!-- Respiration -->
+        <div
+          class="bg-white/3 border border-white/4 rounded-lg p-2 text-center h-[52px] flex flex-col justify-center"
+        >
+          <div
+            class="text-[10px] text-[#8e939e] flex items-center justify-center gap-1"
+          >
+            <i class="fas fa-lungs text-blue-400"></i>
+            <span>نرخ تنفس</span>
+          </div>
+          <div
+            class="text-base font-bold mt-0.5 text-blue-400"
+            id="respDisplay"
+          >
+            --
+          </div>
+        </div>
+
+        <!-- SpO2 -->
+        <div
+          class="bg-white/3 border border-white/4 rounded-lg p-2 text-center h-[52px] flex flex-col justify-center"
+        >
+          <div
+            class="text-[10px] text-[#8e939e] flex items-center justify-center gap-1"
+          >
+            <i class="fas fa-droplet text-emerald-400"></i>
+            <span>اکسیژن خون</span>
+          </div>
+          <div
+            class="text-base font-bold mt-0.5 text-emerald-400"
+            id="spo2Display"
+          >
+            --
+          </div>
+        </div>
+
+        <!-- Blood Pressure -->
+        <div
+          class="bg-white/3 border border-white/4 rounded-lg p-2 text-center h-[52px] flex flex-col justify-center"
+        >
+          <div
+            class="text-[10px] text-[#8e939e] flex items-center justify-center gap-1"
+          >
+            <i class="fas fa-gauge-high text-rose-400"></i>
+            <span>فشار خون (تخمینی)</span>
+          </div>
+          <div class="text-base font-bold mt-0.5 text-rose-400" id="bpDisplay">
+            --/--
+          </div>
+        </div>
+
+        <!-- Calibration Status -->
+        <div
+          class="bg-white/3 border border-white/4 rounded-lg p-2 text-center h-[52px] flex flex-col justify-center"
+        >
+          <div
+            class="text-[10px] text-[#8e939e] flex items-center justify-center gap-1"
+          >
+            <i class="fas fa-circle-check text-amber-400"></i>
+            <span>وضعیت کالیبراسیون</span>
+          </div>
+          <div class="flex items-center justify-center gap-1 mt-0.5">
+            <span id="calibDisplay" class="text-amber-400 text-xs"
+              ><i class="fas fa-hourglass-half"></i
+            ></span>
+            <span class="text-[10px] text-[#6b7280]" id="calibText"
+              >در حال سنجش</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Signal Header (ECG) -->
+      <div class="flex items-center gap-1 text-[#6b7280] text-[10px]">
+        <i class="fas fa-wave-square text-emerald-500"></i>
+        <span>الکتروکاردیوگرام (ECG بازسازی‌شده)</span>
+      </div>
+      <canvas
+        id="signalCanvas"
+        class="w-full h-[60px] rounded-lg bg-black/50 block shrink-0"
+      ></canvas>
+
+      <!-- Tips -->
+      <div
+        class="flex items-center justify-center my-1 gap-1.25 text-[#6b7280] text-[9px] bg-white/2 rounded-lg p-1.5 shrink-0"
+      >
+        <i class="fas fa-lightbulb text-amber-400"></i>
+        <span>صورت کاملا ثابت روبه‌روی دوربین و در نور مناسب باشد.</span>
+      </div>
+
+      <!-- Footer -->
+      <div
+        class="flex items-center justify-center gap-1.25 text-[#6b7280] text-[9px] bg-white/2 rounded-lg p-1.5 shrink-0 mt-1 text-center"
+      >
+        <i class="fas fa-heart text-rose-500 animate-pulse"></i>
+        <a
+          href="https://linkedin.com/in/nasrin-tavana"
+          target="_blank"
+          class="no-underline"
+        >
+          <span
+            class="text-[#6b7280] text-xs hover:text-white transition-colors"
+            >طراحی توسط تیم ME-rPPG</span
+          >
+        </a>
+      </div>
+    </div>
+
+    <!-- فراخوانی از پوشه استاتیک سرور پایتون -->
+    <script src="/static/app.js"></script>
+  </body>
+</html>

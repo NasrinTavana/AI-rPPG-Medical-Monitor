@@ -1,0 +1,13 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+medical_device.db
+medical_device.log
+rppg_outputs/
+.env
+*.onnx
+*.db
+*.mp4
+*.avi
+imeout=200/

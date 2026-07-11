@@ -1,0 +1,12 @@
+flask
+flask-socketio
+eventlet
+numpy
+scipy
+pillow
+opencv-python-headless
+mediapipe
+onnxruntime
+torch
+torchvision
+cryptography

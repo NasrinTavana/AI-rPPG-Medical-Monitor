@@ -1,0 +1,16 @@
+{
+    "age": "28",
+    "gender": "Male",
+    "patient_id_hash": "2f183a4e64493af3f377f745eda502363cd3e7ef6e4d266d444758de0a85fcc8",
+    "session_start": "2026-07-11T09:02:52.732608",
+    "device_status": "monitoring",
+    "fda_status": "PROTOTYPE - Not FDA Cleared",
+    "algorithms_used": {
+        "heart_rate": "PRISM (Eigen-based PPG extraction)",
+        "spo2": "PWA (Pulse Wave Analysis) - FDA Standard",
+        "skin_classification": "EfficientNet-B0 (Fitzpatrick Scale)",
+        "light_estimation": "Histogram + MediaPipe + Neural Network",
+        "respiratory_rate": "FFT on Green Channel"
+    },
+    "timestamp": 1783747972.732609
+}
