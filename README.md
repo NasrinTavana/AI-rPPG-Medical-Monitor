@@ -88,5 +88,5 @@ This project implements several advanced methodologies often required for **FDA 
 * **Name / نام:** Nasrin Tavana (نسرین توانا)
 * **Email / ایمیل:** [en.n.tavana@gmail.com](mailto:en.n.tavana@gmail.com)
 * **GitHub:** [@NasrinTavana](https://github.com/NasrinTavana/)
-https://www.linkedin.com/in/nasrin-tavana/
+* **Linkedin:** https://www.linkedin.com/in/nasrin-tavana/
 ---
